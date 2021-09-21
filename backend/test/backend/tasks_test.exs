@@ -12,24 +12,6 @@ defmodule Backend.TasksTest do
   @update_group_attrs %{completed_at: "2011-05-18T15:01:01Z", name: "some updated group"}
   @invalid_group_attrs %{name: nil}
 
-  def task_fixture(attrs \\ %{}) do
-    {:ok, task} =
-      attrs
-      |> Enum.into(@valid_attrs)
-      |> Tasks.create_task()
-
-    task
-  end
-
-  def group_fixture(attrs \\ %{}) do
-    {:ok, group} =
-      attrs
-      |> Enum.into(@valid_attrs)
-      |> Tasks.create_group()
-
-    group
-  end
-
   describe "tasks" do
     test "list_group_tasks/1 returns tasks related to a group" do
       group = group_fixture()

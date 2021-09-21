@@ -24,6 +24,7 @@ defmodule Backend.DataCase do
       import Ecto.Changeset
       import Ecto.Query
       import Backend.DataCase
+      import Backend.Fixtures
     end
   end
 

@@ -1,7 +1,6 @@
 defmodule BackendWeb.SchemaTest do
   use BackendWeb.ConnCase
 
-  alias Backend.Tasks
   alias Backend.Tasks.Task
 
   @groups """
@@ -169,24 +168,5 @@ defmodule BackendWeb.SchemaTest do
                }
              }
            } = json_response(conn, 200)
-  end
-
-  # Private
-  defp group_fixture(attrs \\ %{}) do
-    {:ok, group} =
-      attrs
-      |> Enum.into(%{name: "some group"})
-      |> Tasks.create_group()
-
-    group
-  end
-
-  defp task_fixture(attrs \\ %{}) do
-    {:ok, task} =
-      attrs
-      |> Enum.into(%{name: "some task"})
-      |> Tasks.create_task()
-
-    task
   end
 end
