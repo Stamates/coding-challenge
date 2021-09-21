@@ -178,7 +178,7 @@ defmodule Backend.Tasks do
   @spec create_group(term()) :: {:ok, Group.t()} | {:error, Ecto.Changeset.t()}
   def create_group(attrs \\ %{}) do
     %Group{}
-    |> Group.changeset(attrs)
+    |> Group.create_changeset(attrs)
     |> Repo.insert()
   end
 
@@ -197,7 +197,8 @@ defmodule Backend.Tasks do
   @spec update_group(Group.t(), term()) :: {:ok, Group.t()} | {:error, Ecto.Changeset.t()}
   def update_group(%Group{} = group, attrs) do
     group
-    |> Group.changeset(attrs)
+    |> preload_tasks()
+    |> Group.update_changeset(maybe_load_tasks(attrs))
     |> Repo.update()
   end
 
@@ -229,9 +230,23 @@ defmodule Backend.Tasks do
   """
   @spec change_group(Group.t(), term()) :: Ecto.Changeset.t()
   def change_group(%Group{} = group, attrs \\ %{}) do
-    Group.changeset(group, attrs)
+    Group.update_changeset(group, attrs)
   end
 
   @spec preload_tasks(Groug.t() | [Group.t()]) :: Group.t() | [Group.t()]
   def preload_tasks(group), do: Repo.preload(group, :tasks)
+
+  @spec get_tasks_by_ids(list()) :: list(Task.t())
+  def get_tasks_by_ids(task_ids), do: Repo.all(from t in Task, where: t.id in ^task_ids)
+
+  # Private
+  defp maybe_load_tasks(%{task_ids: task_ids} = attrs) do
+    Map.put(attrs, :tasks, get_tasks_by_ids(task_ids))
+  end
+
+  defp maybe_load_tasks(%{"task_ids" => task_ids} = attrs) do
+    Map.put(attrs, "tasks", get_tasks_by_ids(task_ids))
+  end
+
+  defp maybe_load_tasks(attrs), do: attrs
 end

@@ -138,6 +138,21 @@ defmodule Backend.TasksTest do
       assert group.name == "some updated group"
     end
 
+    test "update_group/2 setting tasks" do
+      group = group_fixture()
+      task = task_fixture()
+      other_group = group_fixture()
+      other_task = task_fixture(group_id: other_group.id)
+
+      assert {:ok, %Group{} = group} =
+               Tasks.update_group(group, %{task_ids: [task.id, other_task.id]})
+
+      task_ids =
+        group |> Tasks.preload_tasks() |> Map.get(:tasks) |> Enum.map(& &1.id) |> MapSet.new()
+
+      assert MapSet.equal?(task_ids, MapSet.new([task.id, other_task.id]))
+    end
+
     test "update_group/2 with invalid data returns error changeset" do
       group = group_fixture()
       assert {:error, %Ecto.Changeset{}} = Tasks.update_group(group, @invalid_group_attrs)
