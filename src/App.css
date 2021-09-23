@@ -1,0 +1,37 @@
+.App-container {
+  width: 80%;
+  margin-top: 60px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.App-header {
+  padding-bottom: 25px;
+  border-bottom: 1px solid lightgray;
+}
+
+.App-header-text {
+  font-weight: lighter;
+  font-size: 1.5em;
+  display: inline;
+}
+
+.App-header-link {
+  float: right;
+  color: blue;
+}
+
+.App-list-item {
+  border-bottom: 1px solid lightgray;
+  padding: 15px 5px 15px 5px;
+}
+
+.App-completion-status {
+  color: lightgray;
+  font-size: 0.7em;
+  text-transform: uppercase;
+}
+
+.App-group-link {
+  color: black;
+}
