@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { act } from 'react-dom/test-utils'
 import { MockedProvider } from '@apollo/client/testing'
 import App from './App'
@@ -26,8 +26,8 @@ test('renders group list', async () => {
     </MockedProvider>
   )
 
-  const textElement = screen.getByText(/Things To Do/i)
-  expect(textElement).toBeInTheDocument()
+  const groupsHeader = screen.getByText(/Things To Do/i)
+  expect(groupsHeader).toBeInTheDocument()
 
   await act(async () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -35,4 +35,28 @@ test('renders group list', async () => {
 
   const groupName = screen.getByText(/new group/i)
   expect(groupName).toBeInTheDocument()
+})
+
+test('can navigate to group tasks and back', async () => {
+  render(
+    <MockedProvider mocks={mocks} addTypename={false} >
+      <App />
+    </MockedProvider>
+  )
+
+  await act(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  })
+
+  const groupsHeader = screen.getByText(/Things To Do/i)
+  const groupName = screen.getByText(/new group/i)
+  fireEvent.click(groupName)
+
+  const groupsLink = screen.getByText(/all groups/i)
+  expect(groupsLink).toBeInTheDocument()
+  expect(groupsHeader).not.toBeInTheDocument()
+
+  fireEvent.click(groupsLink)
+
+  expect(screen.getByText(/Things To Do/i)).toBeInTheDocument()
 })

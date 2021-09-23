@@ -3,7 +3,7 @@ import { useQuery } from '@apollo/client'
 import { GET_ALL_GROUPS } from '../queries'
 import Group from './group'
 
-const Groups = () => {
+export default function Groups({ setGroup }) {
   const { loading, error, data } = useQuery(GET_ALL_GROUPS)
   if (loading) return <p>Loading...</p>
   if (error) return <p>Sheeeit something's broke</p>
@@ -11,9 +11,9 @@ const Groups = () => {
 
   return (
     data.groups.map((group) => (
-      <Group group={group} key={group.id} />
+      <div key={group.id}>
+        <Group group={group} setGroup={setGroup} />
+      </div>
     ))
   )
 }
-
-export default Groups

@@ -7,12 +7,14 @@ function taskCompletion(group) {
   return completed + ' of ' + group.tasks.length
 }
 
-const Group = ({ group }) => {
+const Group = ({ group, setGroup }) => {
   return (
-    <div className='App-list-item' >
-      <strong>{group.name}</strong>
-      <br />
-      <span className='App-completion-status'>{taskCompletion(group) + ' complete'}</span>
+    <div className='App-list-item'>
+      <span className='App-group-link' onClick={() => { setGroup(group) }}>
+        <strong>{group.name}</strong>
+        <br />
+        <span className='App-completion-status'>{taskCompletion(group) + ' complete'}</span>
+      </span>
     </div >
   )
 }
