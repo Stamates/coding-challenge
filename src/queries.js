@@ -11,3 +11,12 @@ query {
   }
 }
 `
+
+export const ADD_GROUP = gql`
+mutation CreateGroup($name: String!) {
+  createGroup(group: {name: $name}) {
+    id
+    name
+  }
+}
+`
