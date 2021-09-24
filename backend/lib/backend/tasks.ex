@@ -112,13 +112,8 @@ defmodule Backend.Tasks do
   """
   @spec delete_task(Task.t() | pos_integer() | String.t()) ::
           {:ok, Task.t()} | {:error, Ecto.Changeset.t()}
-  def delete_task(%Task{} = task) do
-    Repo.delete(task)
-  end
-
-  def delete_task(task_id) do
-    task_id |> get_task!() |> Repo.delete()
-  end
+  def delete_task(%Task{} = task), do: task |> Repo.delete() |> maybe_update_parent_lock()
+  def delete_task(task_id), do: task_id |> get_task!() |> delete_task()
 
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking task changes.
@@ -142,13 +137,7 @@ defmodule Backend.Tasks do
   def maybe_update_parent_lock({:error, changeset}), do: {:error, changeset}
   def maybe_update_parent_lock({:ok, %Task{parent_id: nil} = task}), do: {:ok, task}
 
-  def maybe_update_parent_lock({:ok, %Task{completed_at: nil, parent_id: parent_id} = task}) do
-    parent_id |> get_task!() |> maybe_toggle_task_lock(:lock)
-    {:ok, task}
-  end
-
-  def maybe_update_parent_lock({:ok, %Task{completed_at: completed, parent_id: parent_id} = task})
-      when not is_nil(completed) do
+  def maybe_update_parent_lock({:ok, %Task{parent_id: parent_id} = task}) do
     parent_task = parent_id |> get_task!()
 
     parent_task

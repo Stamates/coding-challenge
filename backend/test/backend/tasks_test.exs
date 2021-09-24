@@ -70,6 +70,19 @@ defmodule Backend.TasksTest do
       assert_raise Ecto.NoResultsError, fn -> Tasks.get_task!(task.id) end
     end
 
+    test "delete_task/1 unlocks a parent task if no other incomplete children exist" do
+      parent_task = task_fixture(locked: true)
+      task = task_fixture(parent_id: parent_task.id)
+
+      _completed_child_task =
+        task_fixture(completed_at: "2011-05-18T15:01:01Z", parent_id: parent_task.id)
+
+      assert {:ok, %Task{}} = Tasks.delete_task(task)
+      assert_raise Ecto.NoResultsError, fn -> Tasks.get_task!(task.id) end
+      reloaded_parent_task = Tasks.get_task!(parent_task.id)
+      refute reloaded_parent_task.locked
+    end
+
     test "change_task/1 returns a task changeset" do
       task = task_fixture()
       assert %Ecto.Changeset{} = Tasks.change_task(task)
