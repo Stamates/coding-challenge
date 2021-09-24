@@ -16,7 +16,8 @@ export default function AddTask({ group, setTasks }) {
   return (
     <div className='App-add-item'>
       <input
-        placeholder="task name"
+        placeholder='task name'
+        className='App-text-input'
         onChange={e => setName(e.target.value)}
         value={name}
       />

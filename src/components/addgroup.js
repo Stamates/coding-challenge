@@ -16,7 +16,8 @@ export default function AddGroup({ setGroups }) {
   return (
     <div className='App-add-item'>
       <input
-        placeholder="group name"
+        placeholder='group name'
+        className='App-text-input'
         onChange={e => setName(e.target.value)}
         value={name}
       />

@@ -36,7 +36,7 @@
   color: black;
 }
 
-input {
+.App-text-input {
   padding: 10px;
   margin: 10px 0;
   border-left: 1px solid gray;
@@ -45,6 +45,14 @@ input {
   border-right: none;
   border-radius: 5px 0 0 5px;
   width: 60%;
+}
+
+.Task-completion {
+  margin-right: 15px;
+}
+
+input[type=checkbox] {
+  transform: scale(1.5);
 }
 
 input:focus {

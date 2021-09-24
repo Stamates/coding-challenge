@@ -3,8 +3,8 @@ import { useMutation } from '@apollo/client'
 import { DELETE_GROUP, GET_ALL_GROUPS } from '../queries'
 
 function taskCompletion(group) {
-  let completed = group.tasks.reduce(function (task, acc) {
-    return task.completedAt ? acc + 1 : acc
+  let completed = group.tasks.reduce(function (acc, task) {
+    return task.completed_at ? acc + 1 : acc
   }, 0)
   return completed + ' of ' + group.tasks.length
 }
