@@ -61,9 +61,10 @@ function Completion({ task }) {
     return <img className='Task-completion' style={{ transform: 'scale(1.5)', marginLeft: '5px' }} src='/locked.svg' alt='Locked' />
   }
   return (
-    <input
+    <img
+      src='/incomplete.svg'
+      alt='Incomplete'
       className='Task-completion'
-      type='checkbox'
       onClick={() => {
         completeTask({ variables: { id: task.id, completed_at: Math.floor((new Date()).getTime() / 1000) } })
         setCompletion(true)
