@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { useMutation } from '@apollo/client'
-import { DELETE_TASK, GET_GROUP_TASKS, COMPLETE_TASK } from '../queries'
+import { useMutation, useQuery } from '@apollo/client'
+import { DELETE_TASK, GET_TASK, GET_GROUP_TASKS, COMPLETE_TASK } from '../queries'
 
 export default function Task({ task }) {
   const [deleteTask] = useMutation(DELETE_TASK,
@@ -15,7 +15,7 @@ export default function Task({ task }) {
   return (
     <div className='App-list-item'>
       <Completion task={task} />
-      {task.name}
+      <TaskDescription task={task} />
       <span className='App-header-link' onClick={() => {
         deleteTask({ variables: { id: task.id } })
       }}
@@ -26,8 +26,23 @@ export default function Task({ task }) {
   )
 }
 
+function TaskDescription({ task }) {
+  const { loading, error, data } = useQuery(GET_TASK, { variables: { id: task.parent_id } })
+  if (!task.parent_id) return task.name
+  if (loading) return task.name
+  if (error) return task.name
+
+  return <span>{task.name} <span style={{ color: 'gray', fontStyle: 'italic' }}>- parent[{data.task.name}]</span></span>
+}
+
 function Completion({ task }) {
-  const [completeTask] = useMutation(COMPLETE_TASK)
+  const [completeTask] = useMutation(COMPLETE_TASK,
+    {
+      refetchQueries: [{
+        query: GET_GROUP_TASKS,
+        variables: { group_id: task.group_id }
+      }]
+    })
   const [completed, setCompletion] = useState(!!task.completed_at)
 
   if (completed) {
@@ -43,7 +58,7 @@ function Completion({ task }) {
       />
     )
   } else if (task.locked) {
-    return <img className='Task-completion' src='/locked.svg' alt='Locked' />
+    return <img className='Task-completion' style={{ transform: 'scale(1.5)', marginLeft: '5px' }} src='/locked.svg' alt='Locked' />
   }
   return (
     <input

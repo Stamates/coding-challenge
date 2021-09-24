@@ -57,13 +57,18 @@ defmodule BackendWeb.Schema do
       resolve(&fetch_group/2)
     end
 
-    @desc "Get all tasks for group"
+    @desc "Get all tasks"
     field :tasks, list_of(non_null(:task)) do
+      resolve(fn _, _ -> {:ok, Tasks.list_tasks() |> Tasks.preload_dependencies()} end)
+    end
+
+    @desc "Get all tasks for group"
+    field :group_tasks, list_of(non_null(:task)) do
       arg(:group_id, non_null(:id))
       resolve(&all_tasks_for_group/2)
     end
 
-    @desc "Get group by id"
+    @desc "Get task by id"
     field :task, non_null(:task) do
       arg(:id, non_null(:id))
       resolve(&fetch_task/2)

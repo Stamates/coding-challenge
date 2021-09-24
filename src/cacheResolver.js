@@ -16,6 +16,13 @@ export const cacheResolver = new InMemoryCache({
         }
       },
     },
+    Tasks: {
+      fields: {
+        tasks: {
+          merge: true,
+        }
+      },
+    },
     Task: {
       fields: {
         tasks: {

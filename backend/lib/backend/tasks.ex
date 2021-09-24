@@ -14,6 +14,20 @@ defmodule Backend.Tasks do
 
   ## Examples
 
+      iex> list_tasks()
+      [%Task{}, ...]
+
+  """
+  @spec list_tasks() :: list(Task.t())
+  def list_tasks do
+    Repo.all(Task)
+  end
+
+  @doc """
+  Returns the list of tasks for a group.
+
+  ## Examples
+
       iex> list_group_tasks(group)
       [%Task{}, ...]
 
@@ -61,7 +75,7 @@ defmodule Backend.Tasks do
     %Task{}
     |> Task.changeset(attrs)
     |> Repo.insert()
-    |> maybe_lock_parent()
+    |> maybe_update_parent_lock()
   end
 
   @doc """
@@ -81,7 +95,7 @@ defmodule Backend.Tasks do
     task
     |> Task.changeset(attrs)
     |> Repo.update()
-    |> maybe_lock_parent()
+    |> maybe_update_parent_lock()
   end
 
   @doc """
@@ -123,18 +137,41 @@ defmodule Backend.Tasks do
   @spec preload_dependencies(Task.t() | [Task.t()]) :: Task.t() | [Task.t()]
   def preload_dependencies(task), do: Repo.preload(task, :dependencies)
 
-  @spec maybe_lock_parent({:ok, Task.t()} | {:error, Ecto.Changeset.t()}) ::
+  @spec maybe_update_parent_lock({:ok, Task.t()} | {:error, Ecto.Changeset.t()}) ::
           {:ok, Task.t()} | {:error, Ecto.Changeset.t()}
-  def maybe_lock_parent({:error, changeset}), do: {:error, changeset}
-  def maybe_lock_parent({:ok, %Task{parent_id: nil} = task}), do: {:ok, task}
+  def maybe_update_parent_lock({:error, changeset}), do: {:error, changeset}
+  def maybe_update_parent_lock({:ok, %Task{parent_id: nil} = task}), do: {:ok, task}
 
-  def maybe_lock_parent({:ok, %Task{completed_at: completed} = task}) when not is_nil(completed),
-    do: {:ok, task}
-
-  def maybe_lock_parent({:ok, %Task{parent_id: parent_id} = task}) do
-    parent_id |> get_task!() |> update_task(%{completed_at: nil, locked: true})
+  def maybe_update_parent_lock({:ok, %Task{completed_at: nil, parent_id: parent_id} = task}) do
+    parent_id |> get_task!() |> maybe_toggle_task_lock(:lock)
     {:ok, task}
   end
+
+  def maybe_update_parent_lock({:ok, %Task{completed_at: completed, parent_id: parent_id} = task})
+      when not is_nil(completed) do
+    parent_task = parent_id |> get_task!()
+
+    parent_task
+    |> preload_dependencies()
+    |> Map.get(:dependencies)
+    |> Enum.all?(& &1.completed_at)
+    |> case do
+      true -> maybe_toggle_task_lock(parent_task, :unlock)
+      false -> maybe_toggle_task_lock(parent_task, :lock)
+    end
+
+    {:ok, task}
+  end
+
+  defp maybe_toggle_task_lock(%Task{locked: false} = task, :unlock), do: task
+
+  defp maybe_toggle_task_lock(%Task{locked: true} = task, :unlock),
+    do: update_task(task, %{locked: false})
+
+  defp maybe_toggle_task_lock(%Task{locked: false} = task, :lock),
+    do: update_task(task, %{completed_at: nil, locked: true})
+
+  defp maybe_toggle_task_lock(%Task{locked: true} = task, :lock), do: task
 
   # Group CRUD
   @doc """

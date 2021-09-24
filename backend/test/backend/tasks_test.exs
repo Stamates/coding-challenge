@@ -83,31 +83,42 @@ defmodule Backend.TasksTest do
                Tasks.preload_dependencies(parent_task)
     end
 
-    test "maybe_lock_parent/1 locks parent task if dependent task is incomplete" do
+    test "maybe_update_parent_lock/1 locks parent task if dependent task is incomplete" do
       parent_task = task_fixture(completed_at: "2011-05-18T15:01:01Z", locked: false)
       assert parent_task.completed_at
-      task = task_fixture(parent_id: parent_task.id)
-      {:ok, _task} = Tasks.maybe_lock_parent({:ok, task})
+      child_task = task_fixture(parent_id: parent_task.id)
+      {:ok, _task} = Tasks.maybe_update_parent_lock({:ok, child_task})
       reloaded_parent_task = Tasks.get_task!(parent_task.id)
       refute reloaded_parent_task.completed_at
       assert reloaded_parent_task.locked
     end
 
-    test "maybe_lock_parent/1 does NOT change parent if child is complete" do
+    test "maybe_update_parent_lock/1 ensures parent is locked if not all children are complete" do
       parent_task = task_fixture()
-      task = task_fixture(completed_at: "2011-05-18T15:01:01Z", parent_id: parent_task.id)
-      assert {:ok, _task} = Tasks.maybe_lock_parent({:ok, task})
-      assert parent_task == Tasks.get_task!(parent_task.id)
+      child_task = task_fixture(completed_at: "2011-05-18T15:01:01Z", parent_id: parent_task.id)
+      _incomplete_child_task = task_fixture(completed_at: nil, parent_id: parent_task.id)
+      assert {:ok, _task} = Tasks.maybe_update_parent_lock({:ok, child_task})
+      reloaded_parent_task = Tasks.get_task!(parent_task.id)
+      refute reloaded_parent_task.completed_at
+      assert reloaded_parent_task.locked
     end
 
-    test "maybe_lock_parent/1 no_ops if no parent task" do
-      task = task_fixture()
-      assert {:ok, ^task} = Tasks.maybe_lock_parent({:ok, task})
+    test "maybe_update_parent_lock/1 unlocks parent if all children are complete" do
+      parent_task = task_fixture(locked: true)
+      child_task = task_fixture(completed_at: "2011-05-18T15:01:01Z", parent_id: parent_task.id)
+      assert {:ok, _task} = Tasks.maybe_update_parent_lock({:ok, child_task})
+      reloaded_parent_task = Tasks.get_task!(parent_task.id)
+      refute reloaded_parent_task.locked
     end
 
-    test "maybe_lock_parent/1 returns error tuple" do
+    test "maybe_update_parent_lock/1 no_ops if no parent task" do
       task = task_fixture()
-      assert {:error, _task} = Tasks.maybe_lock_parent({:error, task})
+      assert {:ok, ^task} = Tasks.maybe_update_parent_lock({:ok, task})
+    end
+
+    test "maybe_update_parent_lock/1 returns error tuple" do
+      task = task_fixture()
+      assert {:error, _task} = Tasks.maybe_update_parent_lock({:error, task})
     end
   end
 

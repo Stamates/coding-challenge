@@ -10,7 +10,7 @@ export default function Tasks({ group }) {
 
   useEffect(() => {
     if (!loading && data) {
-      setTasks(data.tasks);
+      setTasks(data.groupTasks);
     }
   }, [loading, data])
 

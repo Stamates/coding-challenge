@@ -170,9 +170,49 @@ defmodule BackendWeb.SchemaTest do
   end
 
   describe "tasks" do
+    @tasks """
+    query Tasks {
+      tasks {
+        id
+        name
+        group_id
+      }
+    }
+    """
+    test "query: tasks", %{conn: conn} do
+      group1 = group_fixture()
+      %Task{name: task1_name} = task1 = task_fixture(group_id: group1.id)
+      group2 = group_fixture()
+      %Task{name: task2_name} = task2 = task_fixture(group_id: group2.id)
+
+      group1_id = "#{group1.id}"
+      task1_id = "#{task1.id}"
+      group2_id = "#{group2.id}"
+      task2_id = "#{task2.id}"
+
+      conn = post(conn, "/graphiql", %{"query" => @tasks})
+
+      assert %{
+               "data" => %{
+                 "tasks" => [
+                   %{
+                     "id" => ^task1_id,
+                     "name" => ^task1_name,
+                     "group_id" => ^group1_id
+                   },
+                   %{
+                     "id" => ^task2_id,
+                     "name" => ^task2_name,
+                     "group_id" => ^group2_id
+                   }
+                 ]
+               }
+             } = json_response(conn, 200)
+    end
+
     @tasks_for_group """
     query tasksForGroup($group_id: ID!) {
-      tasks(group_id: $group_id) {
+      groupTasks(group_id: $group_id) {
         id
         name
         group_id
@@ -203,7 +243,7 @@ defmodule BackendWeb.SchemaTest do
 
       assert %{
                "data" => %{
-                 "tasks" => [
+                 "groupTasks" => [
                    %{
                      "id" => ^task_id,
                      "name" => ^name,

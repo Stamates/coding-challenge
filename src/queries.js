@@ -1,7 +1,7 @@
 import { gql } from '@apollo/client'
 
 export const GET_ALL_GROUPS = gql`
-query {
+query allGroups{
   groups {
     id
     name
@@ -30,12 +30,24 @@ mutation DeleteGroup($id: ID!) {
 }
 `
 
-export const GET_GROUP_TASKS = gql`
-query tasksForGroup($group_id: ID!) {
-  tasks(group_id: $group_id) {
+
+export const GET_ALL_TASKS = gql`
+query allTasks {
+  tasks {
     id
     name
     group_id
+  }
+}
+`
+
+export const GET_GROUP_TASKS = gql`
+query tasksForGroup($group_id: ID!) {
+  groupTasks(group_id: $group_id) {
+    id
+    name
+    group_id
+    parent_id
     dependencies {
       id
     }
@@ -45,9 +57,18 @@ query tasksForGroup($group_id: ID!) {
 }
 `
 
+export const GET_TASK = gql`
+query getTask ($id: ID){
+  task(id: $id) {
+    id
+    name
+  }
+}
+`
+
 export const ADD_TASK = gql`
-mutation CreateTask($name: String!, $group_id: ID!) {
-  createTask(task: {name: $name, group_id: $group_id}) {
+mutation CreateTask($name: String!, $group_id: ID!, $parent_id: ID) {
+  createTask(task: {name: $name, group_id: $group_id, parent_id: $parent_id}) {
     id
     name
   }
