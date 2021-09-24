@@ -3,11 +3,12 @@ import ReactDOM from 'react-dom';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { ApolloProvider } from '@apollo/client/react';
-import { ApolloClient, InMemoryCache} from '@apollo/client'
+import { ApolloClient } from '@apollo/client'
+import { cacheResolver } from './cacheResolver'
 
-const client = new ApolloClient({
+export const client = new ApolloClient({
   uri: '/graphiql',
-  cache: new InMemoryCache()
+  cache: cacheResolver
 });
 
 ReactDOM.render(

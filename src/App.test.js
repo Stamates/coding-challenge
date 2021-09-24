@@ -1,7 +1,6 @@
-import { render, screen } from '@testing-library/react'
+import { renderApollo, screen } from './testUtils'
 import userEvent from '@testing-library/user-event'
 import { act } from 'react-dom/test-utils'
-import { MockedProvider } from '@apollo/client/testing'
 import App from './App'
 import { ADD_GROUP, DELETE_GROUP, GET_ALL_GROUPS } from './queries'
 
@@ -48,11 +47,7 @@ const mocks = [
 ]
 
 test('renders group list', async () => {
-  render(
-    <MockedProvider mocks={mocks} addTypename={false} >
-      <App />
-    </MockedProvider>
-  )
+  renderApollo(<App />, { mocks })
 
   const groupsHeader = screen.getByText(/Things To Do/i)
   expect(groupsHeader).toBeInTheDocument()
@@ -66,11 +61,7 @@ test('renders group list', async () => {
 })
 
 test('can navigate to group tasks and back', async () => {
-  render(
-    <MockedProvider mocks={mocks} addTypename={false} >
-      <App />
-    </MockedProvider>
-  )
+  renderApollo(<App />, { mocks })
 
   await act(async () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -89,11 +80,7 @@ test('can navigate to group tasks and back', async () => {
 })
 
 test('can add a group', async () => {
-  render(
-    <MockedProvider mocks={mocks} addTypename={false} >
-      <App />
-    </MockedProvider>
-  )
+  renderApollo(<App />, { mocks })
 
   await act(async () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -140,11 +127,7 @@ const deleteMocks = [
 ]
 
 test('can delete a group', async () => {
-  render(
-    <MockedProvider mocks={deleteMocks} addTypename={false} >
-      <App />
-    </MockedProvider>
-  )
+  renderApollo(<App />, { mocks: deleteMocks })
 
   await act(async () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
