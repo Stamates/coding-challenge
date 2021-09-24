@@ -1,8 +1,8 @@
 import { renderApollo, screen } from './testUtils'
 import userEvent from '@testing-library/user-event'
 import { act } from 'react-dom/test-utils'
-import App from './App'
-import { ADD_GROUP, DELETE_GROUP, GET_ALL_GROUPS } from './queries'
+import App from '../App'
+import { ADD_GROUP, DELETE_GROUP, GET_ALL_GROUPS } from '../queries'
 
 const mocks = [
   {
@@ -36,28 +36,20 @@ const mocks = [
         ]
       }
     }
-  },
-  {
-    request: {
-      query: DELETE_GROUP,
-      variables: { id: '1' }
-    },
-    result: { data: { id: '1' } }
   }
 ]
 
 test('renders group list', async () => {
   renderApollo(<App />, { mocks })
 
-  const groupsHeader = screen.getByText(/Things To Do/i)
+  const groupsHeader = screen.getByText(/things to do/i)
   expect(groupsHeader).toBeInTheDocument()
 
   await act(async () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
   })
 
-  const groupName = screen.getByText(/new group/i)
-  expect(groupName).toBeInTheDocument()
+  expect(screen.getByText(/new group/i)).toBeInTheDocument()
 })
 
 test('can navigate to group tasks and back', async () => {
@@ -67,7 +59,7 @@ test('can navigate to group tasks and back', async () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
   })
 
-  const groupsHeader = screen.getByText(/Things To Do/i)
+  const groupsHeader = screen.getByText(/things to do/i)
   userEvent.click(screen.getByText(/new group/i))
 
   const groupsLink = screen.getByText(/all groups/i)
@@ -76,7 +68,7 @@ test('can navigate to group tasks and back', async () => {
 
   userEvent.click(groupsLink)
 
-  expect(screen.getByText(/Things To Do/i)).toBeInTheDocument()
+  expect(screen.getByText(/things to do/i)).toBeInTheDocument()
 })
 
 test('can add a group', async () => {
@@ -142,4 +134,5 @@ test('can delete a group', async () => {
   })
 
   expect(screen.queryByText(/new group/i)).toBeNull()
+  expect(screen.queryByText(/no groups exist/i)).toBeInTheDocument()
 })

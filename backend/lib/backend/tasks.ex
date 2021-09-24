@@ -96,9 +96,14 @@ defmodule Backend.Tasks do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec delete_task(Task.t()) :: {:ok, Task.t()} | {:error, Ecto.Changeset.t()}
+  @spec delete_task(Task.t() | pos_integer() | String.t()) ::
+          {:ok, Task.t()} | {:error, Ecto.Changeset.t()}
   def delete_task(%Task{} = task) do
     Repo.delete(task)
+  end
+
+  def delete_task(task_id) do
+    task_id |> get_task!() |> Repo.delete()
   end
 
   @doc """

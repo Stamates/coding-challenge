@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
 import Groups from './components/groups'
+import Tasks from './components/tasks'
 import './App.css';
 
 export default function App() {
   const [group, setGroup] = useState(null)
-  const component = group ? <GroupMenu group={group} setGroup={setGroup} /> : <MainMenu setGroup={setGroup} />
+  const component = group ? <TaskList group={group} setGroup={setGroup} /> : <GroupList setGroup={setGroup} />
 
   return (
     <div className='App-container'>
@@ -13,7 +14,7 @@ export default function App() {
   )
 }
 
-function MainMenu({ setGroup }) {
+const GroupList = ({ setGroup }) => {
   return (
     <React.Fragment>
       <div className='App-header'>
@@ -24,14 +25,14 @@ function MainMenu({ setGroup }) {
   )
 }
 
-const GroupMenu = ({ group, setGroup }) => {
+const TaskList = ({ group, setGroup }) => {
   return (
     <React.Fragment>
       <div className='App-header'>
         <p className='App-header App-header-text'>{group.name}</p>
         <span className='App-header-link' onClick={() => { setGroup(null) }}>ALL GROUPS</span>
       </div>
-      Tasks
+      <Tasks group={group} />
     </React.Fragment>
   )
 }

@@ -3,7 +3,7 @@ import { useMutation } from '@apollo/client'
 import { ADD_GROUP, GET_ALL_GROUPS } from '../queries'
 
 export default function AddGroup({ setGroups }) {
-  const [task, setTask] = useState("")
+  const [name, setName] = useState("")
   const [addGroup] = useMutation(
     ADD_GROUP,
     {
@@ -17,15 +17,15 @@ export default function AddGroup({ setGroups }) {
     <div className='App-add-item'>
       <input
         placeholder="group name"
-        onChange={e => setTask(e.target.value)}
-        value={task}
+        onChange={e => setName(e.target.value)}
+        value={name}
       />
       <button
         onClick={() => {
-          setTask("")
+          setName("")
           const { data } = addGroup({
             variables: {
-              name: task
+              name: name
             }
           })
           setGroups(data)

@@ -16,11 +16,14 @@ export default function Groups({ setGroup }) {
 
   if (loading) return <p>Loading...</p>
   if (error) return <p>Sheeeit something's broke</p>
-  if (groups && groups.length === 0) return <div>No Groups Exist</div>
 
   return (
     <React.Fragment >
-      <GroupList groups={groups} setGroup={setGroup} setGroups={setGroups} />
+      {
+        (groups && groups.length === 0) ?
+          <div className='App-list-item'>No Groups Exist</div> :
+          <GroupList groups={groups} setGroup={setGroup} setGroups={setGroups} />
+      }
       <AddGroup setGroups={setGroups} />
     </React.Fragment>
   )

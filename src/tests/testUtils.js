@@ -3,7 +3,7 @@ import React from 'react'
 import { render } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import { MockedProvider } from '@apollo/client/testing'
-import cacheResolver from './cacheResolver'
+import cacheResolver from '../cacheResolver'
 
 const renderApollo = (
   node,

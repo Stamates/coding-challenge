@@ -146,7 +146,6 @@ defmodule BackendWeb.SchemaTest do
       group = group_fixture()
       existing_group_task = task_fixture(group_id: group.id)
       group_id = "#{group.id}"
-      existing_group_task_id = "#{existing_group_task.id}"
 
       delete_group = """
       mutation DeleteGroup {
@@ -165,6 +164,8 @@ defmodule BackendWeb.SchemaTest do
                  }
                }
              } = json_response(conn, 200)
+
+      assert_raise(Ecto.NoResultsError, fn -> Backend.Tasks.get_task!(existing_group_task.id) end)
     end
   end
 
@@ -342,6 +343,29 @@ defmodule BackendWeb.SchemaTest do
              } = json_response(conn, 200)
 
       assert completion_date == "2021-09-20 12:00:00Z"
+    end
+
+    test "mutation: deleteTask", %{conn: conn} do
+      task = task_fixture()
+      task_id = "#{task.id}"
+
+      delete_task = """
+      mutation DeleteTask {
+        deleteTask(id: #{task_id}) {
+          id
+        }
+      }
+      """
+
+      conn = post(conn, "/graphiql", %{"query" => delete_task})
+
+      assert %{
+               "data" => %{
+                 "deleteTask" => %{
+                   "id" => ^task_id
+                 }
+               }
+             } = json_response(conn, 200)
     end
   end
 end

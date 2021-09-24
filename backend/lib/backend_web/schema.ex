@@ -102,6 +102,12 @@ defmodule BackendWeb.Schema do
       arg(:task, :update_task_params)
       resolve(&update_task/2)
     end
+
+    @desc "Delete a task"
+    field :delete_task, type: :task do
+      arg(:id, non_null(:id))
+      resolve(fn %{id: id}, _ -> Tasks.delete_task(id) end)
+    end
   end
 
   defp all_tasks_for_group(%{group_id: group_id} = _args, _info) do
