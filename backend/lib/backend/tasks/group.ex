@@ -8,7 +8,7 @@ defmodule Backend.Tasks.Group do
   schema "groups" do
     field(:completed_at, :utc_datetime)
     field(:name, :string)
-    has_many(:tasks, Backend.Tasks.Task)
+    has_many(:tasks, Backend.Tasks.Task, on_delete: :delete_all)
 
     timestamps()
   end

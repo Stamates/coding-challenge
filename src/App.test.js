@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { act } from 'react-dom/test-utils'
 import { MockedProvider } from '@apollo/client/testing'
 import App from './App'
-import { ADD_GROUP, GET_ALL_GROUPS } from './queries'
+import { ADD_GROUP, DELETE_GROUP, GET_ALL_GROUPS } from './queries'
 
 const mocks = [
   {
@@ -38,6 +38,13 @@ const mocks = [
       }
     }
   },
+  {
+    request: {
+      query: DELETE_GROUP,
+      variables: { id: '1' }
+    },
+    result: { data: { id: '1' } }
+  }
 ]
 
 test('renders group list', async () => {
@@ -102,4 +109,54 @@ test('can add a group', async () => {
   })
 
   expect(screen.getByText(/newly added group/i)).toBeInTheDocument()
+})
+
+const deleteMocks = [
+  {
+    request: {
+      query: GET_ALL_GROUPS
+    },
+    result: {
+      data: {
+        groups: [
+          { id: '1', name: 'new group', tasks: [{ id: '1' }] }
+        ]
+      }
+    }
+  },
+  {
+    request: {
+      query: GET_ALL_GROUPS
+    },
+    result: { data: { groups: [] } }
+  },
+  {
+    request: {
+      query: DELETE_GROUP,
+      variables: { id: '1' }
+    },
+    result: { data: { id: '1' } }
+  }
+]
+
+test('can delete a group', async () => {
+  render(
+    <MockedProvider mocks={deleteMocks} addTypename={false} >
+      <App />
+    </MockedProvider>
+  )
+
+  await act(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  })
+
+  const deleteGroup = screen.getByText(/delete/i)
+
+  userEvent.click(deleteGroup)
+
+  await act(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  })
+
+  expect(screen.queryByText(/new group/i)).toBeNull()
 })

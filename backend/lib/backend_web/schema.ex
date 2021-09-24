@@ -84,6 +84,12 @@ defmodule BackendWeb.Schema do
       resolve(&update_group/2)
     end
 
+    @desc "Delete a group"
+    field :delete_group, type: :group do
+      arg(:id, non_null(:id))
+      resolve(fn %{id: id}, _ -> Tasks.delete_group(id) end)
+    end
+
     @desc "Create a task"
     field :create_task, type: :task do
       arg(:task, :create_task_params)

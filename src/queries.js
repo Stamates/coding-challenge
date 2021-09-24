@@ -20,3 +20,11 @@ mutation CreateGroup($name: String!) {
   }
 }
 `
+
+export const DELETE_GROUP = gql`
+mutation DeleteGroup($id: ID!) {
+  deleteGroup(id: $id) {
+    id
+  }
+}
+`

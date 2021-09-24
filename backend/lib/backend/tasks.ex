@@ -214,9 +214,14 @@ defmodule Backend.Tasks do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec delete_group(Group.t()) :: {:ok, Group.t()} | {:error, Ecto.Changeset.t()}
+  @spec delete_group(Group.t() | pos_integer() | String.t()) ::
+          {:ok, Group.t()} | {:error, Ecto.Changeset.t()}
   def delete_group(%Group{} = group) do
     Repo.delete(group)
+  end
+
+  def delete_group(group_id) do
+    group_id |> get_group!() |> Repo.delete()
   end
 
   @doc """
@@ -237,7 +242,7 @@ defmodule Backend.Tasks do
   def preload_tasks(group), do: Repo.preload(group, :tasks)
 
   @spec get_tasks_by_ids(list()) :: list(Task.t())
-  def get_tasks_by_ids(task_ids), do: Repo.all(from t in Task, where: t.id in ^task_ids)
+  def get_tasks_by_ids(task_ids), do: Repo.all(from(t in Task, where: t.id in ^task_ids))
 
   # Private
   defp maybe_load_tasks(%{task_ids: task_ids} = attrs) do

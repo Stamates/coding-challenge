@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { useMutation } from '@apollo/client'
-// import { useAddGroup } from '../clientresolver'
 import { ADD_GROUP, GET_ALL_GROUPS } from '../queries'
 
 export default function AddGroup({ setGroups }) {

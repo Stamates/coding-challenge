@@ -141,6 +141,31 @@ defmodule BackendWeb.SchemaTest do
                MapSet.new([existing_group_task_id, ungrouped_task_id])
              )
     end
+
+    test "mutation: deleteGroup", %{conn: conn} do
+      group = group_fixture()
+      existing_group_task = task_fixture(group_id: group.id)
+      group_id = "#{group.id}"
+      existing_group_task_id = "#{existing_group_task.id}"
+
+      delete_group = """
+      mutation DeleteGroup {
+        deleteGroup(id: #{group_id}) {
+          id
+        }
+      }
+      """
+
+      conn = post(conn, "/graphiql", %{"query" => delete_group})
+
+      assert %{
+               "data" => %{
+                 "deleteGroup" => %{
+                   "id" => ^group_id
+                 }
+               }
+             } = json_response(conn, 200)
+    end
   end
 
   describe "tasks" do

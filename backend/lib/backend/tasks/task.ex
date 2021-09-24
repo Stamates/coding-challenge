@@ -33,8 +33,9 @@ defmodule Backend.Tasks.Task do
   """
   @spec by_group(pos_integer(), Ecto.Query.t() | __MODULE__) :: Ecto.Query.t()
   def by_group(group_id, query \\ __MODULE__) do
-    from q in query,
+    from(q in query,
       where: q.group_id == ^group_id
+    )
   end
 
   defp enforce_lock(

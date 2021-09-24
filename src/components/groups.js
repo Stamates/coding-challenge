@@ -20,7 +20,7 @@ export default function Groups({ setGroup }) {
 
   return (
     <React.Fragment >
-      <GroupList groups={groups} setGroup={setGroup} />
+      <GroupList groups={groups} setGroup={setGroup} setGroups={setGroups} />
       <AddGroup setGroups={setGroups} />
     </React.Fragment>
   )
