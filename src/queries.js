@@ -7,6 +7,7 @@ query {
     name
     tasks {
       id
+      completed_at
     }
   }
 }
@@ -44,12 +45,21 @@ query tasksForGroup($group_id: ID!) {
 }
 `
 
-
 export const ADD_TASK = gql`
 mutation CreateTask($name: String!, $group_id: ID!) {
   createTask(task: {name: $name, group_id: $group_id}) {
     id
     name
+  }
+}
+`
+
+export const COMPLETE_TASK = gql`
+mutation CompleteTask($id: ID!, $completed_at: Int) {
+  updateTask(id: $id, task: {completed_at: $completed_at}) {
+    id
+    name
+    completed_at
   }
 }
 `

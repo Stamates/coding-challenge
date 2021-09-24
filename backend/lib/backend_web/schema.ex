@@ -39,10 +39,10 @@ defmodule BackendWeb.Schema do
   end
 
   input_object :update_task_params do
-    field(:group_id, non_null(:id))
-    field(:name, non_null(:string))
+    field(:group_id, :id)
+    field(:name, :string)
     field(:parent_id, :id)
-    field(:completed_at, :string)
+    field(:completed_at, :integer)
   end
 
   query do
@@ -153,8 +153,8 @@ defmodule BackendWeb.Schema do
   defp maybe_convert_datetime(%{completed_at: nil} = params), do: params
 
   defp maybe_convert_datetime(%{completed_at: completed_at} = params) do
-    case DateTime.from_iso8601(completed_at) do
-      {:ok, datetime, _} -> Map.put(params, :completed_at, datetime)
+    case DateTime.from_unix(completed_at) do
+      {:ok, datetime} -> Map.put(params, :completed_at, datetime)
       error -> error
     end
   end

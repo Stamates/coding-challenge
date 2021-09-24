@@ -316,7 +316,7 @@ defmodule BackendWeb.SchemaTest do
               name: "updated task",
               group_id: #{new_group_id},
               parent_id: null,
-              completed_at: "2021-09-20T12:00:00.000000Z"
+              completed_at: 1632139200
             }
           ) {
           id
