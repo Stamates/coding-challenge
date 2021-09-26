@@ -11,11 +11,12 @@ export default function Task({ task }) {
       }]
     }
   )
+  const [completed, setCompletion] = useState(!!task.completed_at)
 
   return (
     <div className='App-list-item'>
-      <Completion task={task} />
-      <TaskDescription task={task} />
+      <Completion task={task} completed={completed} setCompletion={setCompletion} />
+      <TaskDescription task={task} completed={completed} />
       <span className='App-header-link' onClick={() => {
         deleteTask({ variables: { id: task.id } })
       }}
@@ -27,15 +28,14 @@ export default function Task({ task }) {
 }
 
 function TaskDescription({ task }) {
+  const strikeThrough = task.completed_at ? 'Task-completed' : ''
   const { loading, error, data } = useQuery(GET_TASK, { variables: { id: task.parent_id } })
-  if (!task.parent_id) return task.name
-  if (loading) return task.name
-  if (error) return task.name
+  if (!task.parent_id || loading || error) return <span className={strikeThrough} >{task.name}</span>
 
-  return <span>{task.name} <span style={{ color: 'gray', fontStyle: 'italic' }}>- parent[{data.task.name}]</span></span>
+  return <span className={strikeThrough} >{task.name} <span className='Task-parent' >- parent[{data.task.name}]</span></span>
 }
 
-function Completion({ task }) {
+function Completion({ task, completed, setCompletion }) {
   const [completeTask] = useMutation(COMPLETE_TASK,
     {
       refetchQueries: [{
@@ -43,12 +43,11 @@ function Completion({ task }) {
         variables: { group_id: task.group_id }
       }]
     })
-  const [completed, setCompletion] = useState(!!task.completed_at)
 
   if (completed) {
     return (
       <img
-        className='Task-completion'
+        className='Task-status'
         src='/completed.svg'
         alt='Completed'
         onClick={() => {
@@ -58,13 +57,13 @@ function Completion({ task }) {
       />
     )
   } else if (task.locked) {
-    return <img className='Task-completion' style={{ transform: 'scale(1.5)', marginLeft: '5px' }} src='/locked.svg' alt='Locked' />
+    return <img className='Task-status' style={{ transform: 'scale(1.5)', marginLeft: '5px' }} src='/locked.svg' alt='Locked' />
   }
   return (
     <img
       src='/incomplete.svg'
       alt='Incomplete'
-      className='Task-completion'
+      className='Task-status'
       onClick={() => {
         completeTask({ variables: { id: task.id, completed_at: Math.floor((new Date()).getTime() / 1000) } })
         setCompletion(true)

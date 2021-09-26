@@ -47,10 +47,18 @@
   width: 40%;
 }
 
-.Task-completion {
+.Task-status {
   margin-right: 15px;
 }
 
+.Task-completed {
+  text-decoration: line-through;
+}
+
+.Task-parent {
+  color: gray;
+  font-style: italic;
+}
 
 .Task-parent-selector {
   width: 35%;
