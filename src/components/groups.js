@@ -31,8 +31,11 @@ export default function Groups({ setGroup }) {
 
 function GroupList({ groups, setGroup }) {
   if (groups) {
+    const sortedGroups = [...groups]
+    sortedGroups
+      .sort((group1, group2) => { return group1.name < group2.name ? -1 : 1 })
     return (
-      groups.map((group) => (
+      sortedGroups.map((group) => (
         <div key={group.id}>
           <Group group={group} setGroup={setGroup} key={group.id} />
         </div>

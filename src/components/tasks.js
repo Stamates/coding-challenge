@@ -32,8 +32,17 @@ export default function Tasks({ group }) {
 
 function TaskList({ tasks }) {
   if (tasks) {
+    const sortedTasks = [...tasks]
+    sortedTasks
+      .sort(function (task1, task2) {
+        if (!!task1.completed_at < !!task2.completed_at) return -1
+        if (!!task1.completed_at > !!task2.completed_at) return 1
+        if (!!task1.completed_at === !!task2.completed_at) {
+          return task1.name < task2.name ? -1 : 1
+        }
+      })
     return (
-      tasks.map((task) => (
+      sortedTasks.map((task) => (
         <div key={task.id}>
           <Task task={task} />
         </div>
